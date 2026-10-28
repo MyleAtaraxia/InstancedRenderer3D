@@ -9,7 +9,8 @@ Requires Godot 4.5+ (tested on 4.7.2).
 
 ## Install
 
-Copy `addons/instanced_renderer` into your project.
+Download the zip from the latest GitHub release and extract it into your
+project, or copy `demo/addons/instanced_renderer`.
 
 ## Build
 

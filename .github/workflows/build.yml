@@ -64,8 +64,8 @@ jobs:
         with:
           name: bin-${{ matrix.platform }}-${{ matrix.arch }}
           path: |
-            addons/instanced_renderer/bin/*.dll
-            addons/instanced_renderer/bin/*.so
+            demo/addons/instanced_renderer/bin/*.dll
+            demo/addons/instanced_renderer/bin/*.so
           if-no-files-found: error
 
   release:
@@ -78,18 +78,18 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Drop committed binaries
-        run: rm -f addons/instanced_renderer/bin/*.dll addons/instanced_renderer/bin/*.so
+        run: rm -f demo/addons/instanced_renderer/bin/*.dll demo/addons/instanced_renderer/bin/*.so
 
       - uses: actions/download-artifact@v4
         with:
           pattern: bin-*
           merge-multiple: true
-          path: addons/instanced_renderer/bin
+          path: demo/addons/instanced_renderer/bin
 
       - name: Package addon
         run: |
-          cp LICENSE.md addons/instanced_renderer/
-          zip -r "instanced_renderer-${GITHUB_REF_NAME}.zip" addons/instanced_renderer
+          cp LICENSE.md demo/addons/instanced_renderer/
+          cd demo && zip -r "../instanced_renderer-${GITHUB_REF_NAME}.zip" addons/instanced_renderer -x "*.import"
 
       - name: Create release
         env:

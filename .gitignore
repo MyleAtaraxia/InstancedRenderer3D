@@ -10,3 +10,7 @@
 /demo/.godot/
 /demo/**/*.tmp
 /.scons_cache/
+
+# Editor hot-reload copies of the extension
+~*.dll
+*.TMP

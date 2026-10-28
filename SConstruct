@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import shutil
 
 env = SConscript("godot-cpp/SConstruct")
 
@@ -11,7 +10,7 @@ if os.environ.get("SCONS_CACHE"):
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
 
-output_dir = "addons/instanced_renderer/bin"
+output_dir = "demo/addons/instanced_renderer/bin"
 
 if env["platform"] == "macos":
     library = env.SharedLibrary(
@@ -47,16 +46,6 @@ else:
         source=sources,
     )
 
-
-def copy_addons(target, source, env):
-    shutil.copytree(
-        "addons",
-        "demo/addons",
-        dirs_exist_ok=True,
-    )
-
-
-env.AddPostAction(library, copy_addons)
 
 Default(library)
 
