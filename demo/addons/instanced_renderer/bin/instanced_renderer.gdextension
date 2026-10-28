@@ -4,6 +4,11 @@ entry_symbol = "library_init"
 compatibility_minimum = "4.1"
 reloadable = true
 
+[icons]
+
+InstancedMesh3D = "res://addons/instanced_renderer/icons/InstancedMesh3D.svg"
+InstancedMeshLOD = "res://addons/instanced_renderer/icons/InstancedMeshLOD.svg"
+
 [libraries]
 
 macos.debug = "res://addons/instanced_renderer/bin/libInstancedRenderer.macos.template_debug.framework"
