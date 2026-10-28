@@ -1,4 +1,4 @@
-# instanced_renderer
+# InstancedRenderer3D
 
 GPU-instanced mesh rendering for Godot 4 as a GDExtension. `InstancedMesh3D`
 nodes are batched into MultiMeshes by world, mesh, material and spatial chunk,
