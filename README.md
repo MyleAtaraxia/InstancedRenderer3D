@@ -5,7 +5,7 @@ nodes are batched into MultiMeshes by world, mesh, material and spatial chunk,
 with LOD, physics interpolation and sleeping of resting instances. Works in the
 editor and at runtime.
 
-Requires Godot 4.5+ (tested on 4.7.2).
+Requires Godot 4.4+
 
 ## Install
 
