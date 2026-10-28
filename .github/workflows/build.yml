@@ -1,0 +1,95 @@
+name: Build addon
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "addons/instanced_renderer/bin/**"
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: ${{ matrix.platform }} ${{ matrix.arch }}
+    runs-on: ${{ matrix.os }}
+    env:
+      SCONS_CACHE: ${{ github.workspace }}/.scons_cache
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, platform: windows, arch: x86_64 }
+          - { os: ubuntu-latest, platform: linux, arch: x86_64 }
+          - { os: ubuntu-latest, platform: android, arch: arm64 }
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - run: pip install scons
+
+      - name: godot-cpp version
+        id: godot_cpp
+        shell: bash
+        run: echo "sha=$(git rev-parse HEAD:godot-cpp)" >> "$GITHUB_OUTPUT"
+
+      # Saved under a new key each run; restore takes the newest one for this
+      # platform and godot-cpp version.
+      - uses: actions/cache@v4
+        with:
+          path: .scons_cache
+          key: scons-${{ matrix.platform }}-${{ matrix.arch }}-${{ steps.godot_cpp.outputs.sha }}-${{ github.sha }}
+          restore-keys: scons-${{ matrix.platform }}-${{ matrix.arch }}-${{ steps.godot_cpp.outputs.sha }}-
+
+      - name: Install Android NDK
+        if: matrix.platform == 'android'
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;28.1.13356709" > /dev/null
+
+      - name: Build
+        shell: bash
+        run: |
+          for target in template_debug template_release; do
+            scons platform=${{ matrix.platform }} arch=${{ matrix.arch }} target=$target -j4
+          done
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bin-${{ matrix.platform }}-${{ matrix.arch }}
+          path: |
+            addons/instanced_renderer/bin/*.dll
+            addons/instanced_renderer/bin/*.so
+          if-no-files-found: error
+
+  commit:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bin-*
+          merge-multiple: true
+          path: addons/instanced_renderer/bin
+
+      - name: Commit binaries
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add addons/instanced_renderer/bin
+          if git diff --cached --quiet; then
+            echo "Binaries unchanged."
+            exit 0
+          fi
+          git commit -m "Build addon binaries [skip ci]"
+          git pull --rebase
+          git push

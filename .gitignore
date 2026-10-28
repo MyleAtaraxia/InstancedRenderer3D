@@ -9,3 +9,4 @@
 
 /demo/.godot/
 /demo/**/*.tmp
+/.scons_cache/

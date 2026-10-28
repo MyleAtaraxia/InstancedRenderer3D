@@ -4,6 +4,10 @@ import shutil
 
 env = SConscript("godot-cpp/SConstruct")
 
+# Set by CI; also covers the godot-cpp objects built above.
+if os.environ.get("SCONS_CACHE"):
+    CacheDir(os.environ["SCONS_CACHE"])
+
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
 
