@@ -65,6 +65,8 @@ public:
       "instanced_renderer/interpolation/quality";
   static constexpr const char *SETTING_INITIAL_CAPACITY =
       "instanced_renderer/buffer/initial_capacity";
+  static constexpr const char *SETTING_DEFAULT_CHUNK_SIZE =
+      "instanced_renderer/batching/default_chunk_size";
   static constexpr const char *SETTING_SLEEP_AFTER_FRAMES =
       "instanced_renderer/batching/sleep_after_frames";
   static constexpr const char *SETTING_GIZMO_COLOR =

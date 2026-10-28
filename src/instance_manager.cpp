@@ -53,6 +53,8 @@ void InstanceManager::register_project_settings() {
               "Fast,High");
   add_setting(SETTING_INITIAL_CAPACITY, 16, PROPERTY_HINT_RANGE,
               "1,65536,1,or_greater");
+  add_setting(SETTING_DEFAULT_CHUNK_SIZE, 64.0, PROPERTY_HINT_RANGE,
+              "0,1024,0.1,or_greater,suffix:m");
   add_setting(SETTING_SLEEP_AFTER_FRAMES, 60, PROPERTY_HINT_RANGE,
               "0,600,1,or_greater");
   add_setting(SETTING_GIZMO_COLOR, Color(1.0, 0.8, 0.2));

@@ -59,3 +59,10 @@ def copy_addons(target, source, env):
 env.AddPostAction(library, copy_addons)
 
 Default(library)
+
+# Demo-only extension (not part of the addon): `scons demo`.
+demo_library = env.SharedLibrary(
+    "demo/bin/libDemo{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+    source=Glob("demo_src/*.cpp"),
+)
+Alias("demo", demo_library)

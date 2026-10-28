@@ -39,6 +39,7 @@ protected:
   void _notification(int p_what);
 
 public:
+  InstancedMesh3D();
   // Returns true once the node no longer needs watching.
   bool update_sleep(uint64_t now);
   void set_mesh(const Ref<Mesh> &p_mesh);

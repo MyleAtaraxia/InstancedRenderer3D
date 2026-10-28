@@ -1,46 +1,37 @@
 [gd_scene format=3 uid="uid://7evstgekap24"]
 
-[sub_resource type="GDScript" id="GDScript_e5uuo"]
-script/source = "extends Node3D
+[ext_resource type="Script" uid="uid://dnl5nvo42a21r" path="res://scenes/sine_grid.gd" id="1"]
 
-@export var mesh: Mesh
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	var size := 64
-	print(\"instance count: \", size**3)
-	for x in size: for y in size: for z in size: 
-		var instance = InstancedMesh3D.new()
-		instance.mesh = mesh
-		add_child(instance)
-		var pos = Vector3(x,y,z) * 10
-		instance.position = pos
-		instance.is_static = false
-"
+[sub_resource type="Environment" id="4"]
+background_mode = 1
+background_color = Color(0.7019608, 0.8, 0.9019608, 1)
+fog_light_color = Color(0.7, 0.8, 0.9, 1)
+fog_density = 0.004
 
-[sub_resource type="BoxMesh" id="BoxMesh_nnsk1"]
+[node name="SineGrid" type="Node3D" unique_id=1686852757]
+script = ExtResource("1")
+grid_size = Vector2i(500, 500)
+spacing = 1.0
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_e5uuo"]
-sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
-ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1372202967]
+environment = SubResource("4")
 
-[sub_resource type="Sky" id="Sky_nnsk1"]
-sky_material = SubResource("ProceduralSkyMaterial_e5uuo")
+[node name="Sun" type="DirectionalLight3D" parent="." unique_id=1125716178]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 0, 0)
 
-[sub_resource type="Environment" id="Environment_rwgxs"]
-background_mode = 2
-sky = SubResource("Sky_nnsk1")
-glow_enabled = true
+[node name="CameraPivot" type="Node3D" parent="." unique_id=467590275]
 
-[node name="Node3D" type="Node3D" unique_id=1649605220]
-script = SubResource("GDScript_e5uuo")
-mesh = SubResource("BoxMesh_nnsk1")
+[node name="Camera3D" type="Camera3D" parent="CameraPivot" unique_id=1381112370]
+transform = Transform3D(1, 0, 0, 0, 0.906308, 0.422618, 0, -0.422618, 0.906308, 0, 45, 95)
+fov = 60.0
+far = 500.0
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=127881352]
-transform = Transform3D(-0.8660254, -0.43301278, 0.25, 0, 0.49999997, 0.86602545, -0.50000006, 0.75, -0.43301266, 0, 0, 0)
-shadow_enabled = true
+[node name="UI" type="CanvasLayer" parent="." unique_id=1328401583]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1771697285]
-environment = SubResource("Environment_rwgxs")
-
-[node name="Camera3D" type="Camera3D" parent="." unique_id=1263466456]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 32)
+[node name="Stats" type="Label" parent="UI" unique_id=1628743935]
+offset_left = 12.0
+offset_top = 10.0
+offset_right = 600.0
+offset_bottom = 40.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4

@@ -1,0 +1,78 @@
+extends Node3D
+
+@export var grid_size := Vector2i(100, 100)
+@export var spacing := 1.2
+@export var amplitude := 2.0:
+	set(value):
+		amplitude = value
+		wave.configure({amplitude = value})
+@export var frequency := 0.15
+@export var speed := 2.0
+@export var updates_enabled := true
+@export_range(0, 240) var updates_per_second := 30:
+	set(value):
+		updates_per_second = value
+		if interpolate and value > 0 and is_node_ready():
+			Engine.physics_ticks_per_second = value
+
+@export var interpolate := true
+
+var wave := SineGrid.new()
+var ids := PackedInt64Array()
+var renderer: InstancedRenderer3D
+var time := 0.0
+var since_update := 0.0
+var wave_ms := 0.0
+
+@onready var pivot: Node3D = $CameraPivot
+@onready var stats: Label = $UI/Stats
+
+func _ready() -> void:
+	if interpolate:
+		get_tree().physics_interpolation = true  # before get_renderer(), which reads it
+		if updates_per_second > 0:
+			Engine.physics_ticks_per_second = updates_per_second
+	wave.configure({
+		size_x = grid_size.x, size_z = grid_size.y, spacing = spacing,
+		amplitude = amplitude, frequency = frequency, speed = speed,
+	})
+
+	var box := BoxMesh.new()
+	var material := StandardMaterial3D.new()
+	material.albedo_color = Color(1.0, 0.55, 0.2)
+	material.roughness = 0.6
+
+	renderer = InstanceManager.get_renderer(get_world_3d(), box, material)
+	renderer.set_estimated_instance_count(wave.get_count())
+	for i in wave.get_count():
+		ids.append(renderer.add_instance(Transform3D()))
+	renderer.update_instances(ids, wave.step(time))
+
+
+func _exit_tree() -> void:
+	if renderer:
+		renderer.clear_instances()
+
+func _physics_process(delta: float) -> void:
+	pivot.rotate_y(delta * 0.1)
+	_update_stats()
+	if not updates_enabled:
+		return
+	time += delta
+	since_update += delta
+	var interval := 1.0 / updates_per_second if updates_per_second > 0 else 0.0
+	if since_update >= interval:
+		since_update = fmod(since_update, interval) if interval > 0.0 else 0.0
+		var t0 := Time.get_ticks_usec()
+		renderer.update_instances(ids, wave.step(time))
+		wave_ms = lerpf(wave_ms, (Time.get_ticks_usec() - t0) / 1000.0, 0.1)
+
+
+func _update_stats() -> void:
+	var rate := "off"
+	if updates_enabled:
+		rate = "%d Hz" % updates_per_second if updates_per_second > 0 else "every tick"
+		if interpolate:
+			rate += ", interpolated"
+	stats.text = "%d boxes  |  %d fps  |  wave %.2f ms @ %s  |  amplitude %.1f" % [
+		ids.size(), Engine.get_frames_per_second(), wave_ms, rate, amplitude]

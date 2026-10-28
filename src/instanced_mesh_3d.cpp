@@ -1,10 +1,17 @@
 #include "instanced_mesh_3d.h"
 #include "instance_manager.h"
 #include <godot_cpp/classes/engine.hpp>
+#include <godot_cpp/classes/project_settings.hpp>
 #include <godot_cpp/variant/callable_method_pointer.hpp>
 #include <godot_cpp/core/class_db.hpp>
 
 namespace godot {
+
+// Nodes left at the default follow the project setting; set ones are saved.
+InstancedMesh3D::InstancedMesh3D() {
+  chunk_size = ProjectSettings::get_singleton()->get_setting(
+      InstanceManager::SETTING_DEFAULT_CHUNK_SIZE, 64.0);
+}
 
 void InstancedMesh3D::_bind_methods() {
   ClassDB::bind_method(D_METHOD("set_mesh", "mesh"),
