@@ -1,0 +1,3 @@
+CompileFlags:
+  Add:
+    - -IC:/Dev/PATH/llvm-mingw-20260826-msvcrt-x86_64/include/c++/v1

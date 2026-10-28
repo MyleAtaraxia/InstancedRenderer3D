@@ -1,0 +1,11 @@
+.sconsign.dblite
+*.obj
+*.exp
+*.lib
+
+/.cache/
+/.zed/
+/compile_commands.json
+
+/demo/.godot/
+/demo/**/*.tmp
