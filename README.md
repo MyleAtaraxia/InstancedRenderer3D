@@ -39,3 +39,5 @@ r.remove_instance(id)
 ```
 
 Project settings are under `instanced_renderer/`.
+
+![InstancedRenderer3D screenshot](assets/screenshot.webp)
