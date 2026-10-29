@@ -1,12 +1,12 @@
 extends Node3D
 
-@export var grid_size := Vector2i(100, 100)
-@export var spacing := 1.2
-@export var amplitude := 2.0:
+@export var grid_size := Vector2i(140, 140)
+@export var spacing := 1.5
+@export var amplitude := 2.6:
 	set(value):
 		amplitude = value
 		wave.configure({amplitude = value})
-@export var frequency := 0.15
+@export var frequency := 0.11
 @export var speed := 2.0
 @export var updates_enabled := true
 @export_range(0, 240) var updates_per_second := 30:
@@ -23,11 +23,13 @@ var renderer: InstancedRenderer3D
 var time := 0.0
 var since_update := 0.0
 var wave_ms := 0.0
+var gpu_ms := 0.0
 
 @onready var pivot: Node3D = $CameraPivot
 @onready var stats: Label = $UI/Stats
 
 func _ready() -> void:
+	RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), true)
 	if interpolate:
 		get_tree().physics_interpolation = true  # before get_renderer(), which reads it
 		if updates_per_second > 0:
@@ -39,8 +41,8 @@ func _ready() -> void:
 
 	var box := BoxMesh.new()
 	var material := StandardMaterial3D.new()
-	material.albedo_color = Color(1.0, 0.55, 0.2)
-	material.roughness = 0.6
+	material.albedo_color = Color("#fc7f7f")
+	material.roughness = 0.55
 
 	renderer = InstanceManager.get_renderer(get_world_3d(), box, material)
 	renderer.set_estimated_instance_count(wave.get_count())
@@ -69,10 +71,12 @@ func _physics_process(delta: float) -> void:
 
 
 func _update_stats() -> void:
+	var gpu := RenderingServer.viewport_get_measured_render_time_gpu(get_viewport().get_viewport_rid())
+	gpu_ms = lerpf(gpu_ms, gpu, 0.1)
 	var rate := "off"
 	if updates_enabled:
 		rate = "%d Hz" % updates_per_second if updates_per_second > 0 else "every tick"
 		if interpolate:
 			rate += ", interpolated"
-	stats.text = "%d boxes  |  %d fps  |  wave %.2f ms @ %s  |  amplitude %.1f" % [
-		ids.size(), Engine.get_frames_per_second(), wave_ms, rate, amplitude]
+	stats.text = "%d boxes  |  %d fps  |  gpu %.2f ms  |  wave %.2f ms" % [
+		ids.size(), Engine.get_frames_per_second(), gpu_ms, wave_ms]
